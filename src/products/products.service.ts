@@ -58,4 +58,22 @@ export class ProductsService implements OnModuleInit {
   findOne(id: string): Promise<Product | null> {
     return this.productsRepository.findOneBy({ id: id as any });
   }
+
+  async create(createProductDto: any): Promise<Product> {
+    const product = this.productsRepository.create(createProductDto);
+    return this.productsRepository.save(product) as Promise<Product>;
+  }
+
+  async update(id: string, updateProductDto: any): Promise<Product> {
+    await this.productsRepository.update(id, updateProductDto);
+    const updated = await this.findOne(id);
+    if (!updated) {
+      throw new Error('Product not found after update');
+    }
+    return updated;
+  }
+
+  async remove(id: string): Promise<void> {
+    await this.productsRepository.delete(id);
+  }
 }
