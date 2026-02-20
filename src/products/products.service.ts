@@ -61,7 +61,7 @@ export class ProductsService implements OnModuleInit {
 
   async create(createProductDto: any): Promise<Product> {
     const product = this.productsRepository.create(createProductDto);
-    return this.productsRepository.save(product) as Promise<Product>;
+    return this.productsRepository.save(product) as any;
   }
 
   async update(id: string, updateProductDto: any): Promise<Product> {
