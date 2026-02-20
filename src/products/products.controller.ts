@@ -11,6 +11,7 @@ import {
   UseInterceptors,
   HttpCode,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
@@ -48,8 +49,18 @@ export class ProductsController {
     },
   })
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
-    const result = await this.cloudinaryService.uploadFile(file);
-    return { url: result.secure_url, public_id: result.public_id };
+    if (!file?.buffer) {
+      throw new BadRequestException(
+        'No file received. On Vercel, ensure request body is not pre-parsed for this route.',
+      );
+    }
+    try {
+      const result = await this.cloudinaryService.uploadFile(file);
+      return { url: result.secure_url, public_id: result.public_id };
+    } catch (err) {
+      const message = err?.message || 'Cloudinary upload failed';
+      throw new BadRequestException(message);
+    }
   }
 
   @Get(':id')
